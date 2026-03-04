@@ -1,4 +1,7 @@
-from zipcodeconway.simple_window import SimpleWindow
+import random
+import tkinter as tk
+
+from simple_window import SimpleWindow
 
 
 class ConwayGameOfLife:
@@ -7,6 +10,9 @@ class ConwayGameOfLife:
     def __init__(self, dimension: int, start_matrix: list[list[int]] | None = None):
         self.dimension = dimension
         self.display_window = SimpleWindow(dimension)
+        self.current_generation: list[list[int]]
+        self.next_generation: list[list[int]]
+        self.count_live_neighbors = lambda row, col, world: sum(world[(row + dr) % self.dimension][(col + dc) % self.dimension] for dr in (-1, 0, 1) for dc in (-1, 0, 1) if not (dr == 0 and dc == 0))
 
         if start_matrix is None:
             self.current_generation = self.create_random_start(dimension)
@@ -21,7 +27,8 @@ class ConwayGameOfLife:
         Which cells are alive or dead in generation 0.
         Allocates and returns the starting matrix of size 'dimension'.
         """
-        return [[0]]
+        
+        return [[random.randint(0, 1) for _ in range(dimension)] for _ in range(dimension)]
 
     def simulate(self, max_generations: int) -> list[list[int]]:
         """
@@ -33,14 +40,24 @@ class ConwayGameOfLife:
         - copy next_generation into current_generation and clear next_generation
         - sleep briefly so animation can be seen
         """
-        return [[0]]
+        for _ in range(max_generations):
+            self.display_window.display(self.current_generation, _)
+            for i in range(self.dimension):
+                for j in range(self.dimension):
+                    self.next_generation[i][j] = self.is_alive(i, j, self.current_generation)
+            self.copy_and_zero_out(self.next_generation, self.current_generation)
+            self.display_window.sleep(100)
+        return self.current_generation
 
     def copy_and_zero_out(self, next_matrix: list[list[int]], current_matrix: list[list[int]]) -> None:
         """
         Copy all values from next_matrix to current_matrix,
         then set all values in next_matrix to 0.
         """
-        pass
+        for i in range(self.dimension):
+            for j in range(self.dimension):
+                current_matrix[i][j] = next_matrix[i][j]
+                next_matrix[i][j] = 0
 
     def is_alive(self, row: int, col: int, world: list[list[int]]) -> int:
         """
@@ -54,12 +71,14 @@ class ConwayGameOfLife:
 
         Use wraparound edges: top/bottom and left/right connect.
         """
-        return 0
+        
+        return 1 if (world[row][col] == 1 and 2 <= self.count_live_neighbors(row, col, world) <= 3) or (world[row][col] == 0 and self.count_live_neighbors(row, col, world) == 3) else 0
 
 
 def main() -> None:
     sim = ConwayGameOfLife(50)
-    sim.simulate(50)
+    sim.simulate(1000)
+    tk.mainloop()
 
 
 if __name__ == "__main__":
