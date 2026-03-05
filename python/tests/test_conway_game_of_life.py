@@ -1,6 +1,7 @@
 import unittest
+import sys
 
-from zipcodeconway.conway_game_of_life import ConwayGameOfLife
+from ..conway_game_of_life import ConwayGameOfLife
 
 
 class ConwayGameOfLifeTest(unittest.TestCase):

@@ -13,6 +13,7 @@ class ConwayGameOfLife:
         self.current_generation: list[list[int]]
         self.next_generation: list[list[int]]
         self.count_live_neighbors = lambda row, col, world: sum(world[(row + dr) % self.dimension][(col + dc) % self.dimension] for dr in (-1, 0, 1) for dc in (-1, 0, 1) if not (dr == 0 and dc == 0))
+        
 
         if start_matrix is None:
             self.current_generation = self.create_random_start(dimension)
@@ -40,7 +41,7 @@ class ConwayGameOfLife:
         - copy next_generation into current_generation and clear next_generation
         - sleep briefly so animation can be seen
         """
-        for _ in range(max_generations):
+        for _ in range(max_generations+1):
             self.display_window.display(self.current_generation, _)
             for i in range(self.dimension):
                 for j in range(self.dimension):
